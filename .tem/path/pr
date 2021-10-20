@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+mkdir -p .tem/files/
+if [ "$1" == "notes" ]; then
+    vim .tem/files/pr-notes.txt
+fi

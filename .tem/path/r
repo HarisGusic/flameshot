@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+pkill flameshot
+./build/src/flameshot &
+./build/src/flameshot config

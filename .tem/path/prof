@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# mkdir -p reldeb
+# cd reldeb
+# cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -D ENABLE_CACHE=OFF ../
+# make -j$(nproc)
+# cd ../
+
+# Start flameshot and get pid
+pkill flameshot
+_reldeb/src/flameshot&
+pid=$(ps -A | grep flameshot | awk '{print $1}')
+
+rm -rf /tmp/FlameGraph
+git clone https://github.com/brendangregg/FlameGraph.git /tmp/FlameGraph
+#build/src/flameshot gui
+cd /tmp/FlameGraph
+perf record -F 99 -p $pid -g -- sleep 30
+perf script | ./stackcollapse-perf.pl > out.perf-folded
+./flamegraph.pl out.perf-folded > perf.svg
+pkill flameshot
+

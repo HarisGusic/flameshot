@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Show TODOs added since the specified branch (or master by default)
+
+[ -n "$1" ] && branch="$1" || branch="master"
+
+git diff "$branch" | grep '\(^+++.*\|^+.*TODO\)' | grep '^+.*TODO.*' -B 1 --color=always

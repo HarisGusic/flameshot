@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+firefox -P minimal build/doxy/html/index.html
