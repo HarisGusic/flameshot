@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Determine Windowing System
+if [ "$XDG_SESSION_TYPE" != "tty" ] ; then
+    WS="$XDG_SESSION_TYPE"
+else
+    WS="${DISPLAY:+X11}${WAYLAND_DISPLAY:+Wayland}"
+fi
+# Determine Desktop Environment (or just Window Manager)
+if [ -n "$DESKTOP_SESSION" ]; then
+    DE="$XDG_CURRENT_DESKTOP $DESKTOP_SESSION"
+else
+    WM="$(wmctrl -m | grep '^Name:' | awk '{print $NF}')"
+fi
+
+# TODO do not hardcode path to flameshot executable
+/usr/bin/flameshot --version
+source /etc/os-release
+echo
+echo "    OS:   $PRETTY_NAME"
+echo "Kernel:   $(uname -s -r)"
+if [ -n "$DE" ]; then
+    echo "    DE:   $DE ($WS)"
+else
+    echo "    WM:   $WM ($WS)"
+fi
+

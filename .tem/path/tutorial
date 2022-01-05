@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+cd "$(tem find --root flameshot)"
+tuterm .tem/files/"$1".tut
+

@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# Temporarily bind keys
+
+TEM_ROOTDIR="$(tem find --root flameshot)"
+config="$TEM_ROOTDIR/.tem/files/.sxhkd.config"
+executable="$TEM_ROOTDIR/.tem/files/sxhkd.tem"
+
+pkill sxhkd.tem 2>/dev/null
+gvim -c 'set ft=sxhkd' "$config"
+
+"$executable" -c "$config" &
+

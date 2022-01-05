@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# Print a friendly name of the commit of the active flameshot executable
+
+basename "$(git describe "$(get_commit)" --all)"
+

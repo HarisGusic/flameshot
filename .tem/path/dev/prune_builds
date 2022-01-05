@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# FIXME when find is refactored and var as well
+rm -rf "$(tem find --root flameshot)/_build/$(git-describe --all )/$(tem var)"

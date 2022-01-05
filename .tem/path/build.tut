@@ -1,0 +1,9 @@
+#!/usr/bin/env tuterm
+
+fake_home "$HOME"
+
+run() {
+    echo "$FAKE_HOME"
+}
+
+# vim: filetype=sh

@@ -1,0 +1,48 @@
+### Terminology
+- Daemon - The instance of flameshot that runs in the background
+- Daemon hosting - The act of running the daemon in order to support some persistent phenomenon (pinned screenshot, clipboard, etc.)
+
+### Things you should know:
+- When you create a pin, the daemon will host it. If it is not running
+- The clipboard gets lost once flameshot quits on X11. Because of this, when any subcommand copies something to the clipboard, the daemon will be asked to host it. Will have to change this behavior for Windows and Mac.
+- If there is no need to host something, the daemon will quit automatically.
+  I.e. when all pinned widgets are closed, or when the clipboard is changed by another application.
+
+### Changes and TODO (there will be more):
+- [X] Pin and clipboard are hosted by the daemon
+- [X] `flameshot screen` does not rely on dbus (except for hosting clipboard and pins)
+- [X] `flameshot full` does not rely on dbus (...)
+- [X] `flameshot gui` does not rely on dbus (...)
+- [X] Do not show tray icon in non-dbus commands
+- [ ] Make `flameshot config` independent from dbus
+- [ ] Make `flameshot launcher` independent from dbus
+
+### TODO (implementation details):
+- [ ] Reconcile `Controller` and `FlameshotDaemon` - make a clear distinction between them
+- [ ] Remove unnecessary arguments in Controller::captureTaken(Failed)
+- [ ] Clean up obsolete code
+
+### Testing:
+- Before testing this PR, make sure the previous daemon version is killed
+- **Everything should work as it did before this PR**
+- If you have a Windows and/or Mac machine, please test thoroughly. I don't have
+  a Mac machine.
+- Run the scripts in the `tests` directory inside the repository root. These
+  will test most of the CLI features.
+- Abuse the `screen`, `full` and `gui` subcommands with various options and verify that the daemon is not launched, except when it needs to host the clipboard and/or pinned screenshots. You can use the script `tests
+- Check if `flameshot gui` works correctly with various options and various types of manual interaction
+- Test if stuff is copied to the clipboard correctly, e.g. paste into GitHub/gimp/etc and/or  run `xclip -o -t TARGETS -selection clip`
+- If the daemon is not needed, it should quit automatically. That is when all pinned screenshot windows are closed and the clipboard gets changed externally.
+- Please test the heck out of daemon auto-launching, because this never worked
+  on my system for some reason. In other words: make sure to **kill** the daemon before doing the other tests.
+- The CLI options should now work on Windows and MacOS too (haven't tested on Windows yet, don't have a Mac)
+
+### Test later (when implemented correctly)
+
+- Test system tray on windows
+
+### To be discussed
+
+- Do we allow multiple instances of `flameshot gui` to run? A benefit of this is the ability to take screenshots of flameshot itself.
+- Add a config option to keep daemon running even if not needed??
+- What should we do with the system tray if the daemon is running merely to host pins, clipboard, etc?

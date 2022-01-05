@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# Checks for bad practices in the code (uses clang-tidy)
+
+cd "$(tem find --root flameshot)"
+clang-tidy $(git ls-files "*.cpp" "*.h") "$@"

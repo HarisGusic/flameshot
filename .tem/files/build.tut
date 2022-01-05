@@ -1,0 +1,19 @@
+#!/usr/bin/env tuterm
+
+FLAMESHOT_DIR="$(tem find --root flameshot)"
+
+run() {
+    M "Hi. This tutorial will teach you how to compile flameshot from source."
+    e git clone "'https://github.com/flameshot-org/flameshot'"
+    git clone "file://$(realpath "$FLAMESHOT_DIR")"
+    c cd flameshot
+    c ls
+    c mkdir build
+    c cd build
+    c cmake ..
+    c make
+    c src/flameshot --version
+    M "Congratulations! You know know how to compile flameshot from source!"
+}
+
+# vim: filetype=sh

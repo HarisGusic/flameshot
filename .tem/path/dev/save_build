@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+# Save the current build of flameshot (the same one that is conveniently
+# accessed using tem)
+
+cd "$(tem find --root flameshot)"
+
+# Get a readable name for the commit of the flameshot executable
+name="$(git_describe)"
+build_type="$(tem var)"
+mkdir -p "_build/saved/$name/"
+cp -r "_build/$build_type" "_build/saved/$name/"

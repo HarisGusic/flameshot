@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# Fetch the commit of the live flameshot executable
+flameshot --version 2>&1 | /usr/bin/grep --only-matching '([^)]*)' | sed -e 's/(//' -e 's/)//'
+
