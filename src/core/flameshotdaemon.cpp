@@ -222,7 +222,7 @@ void FlameshotDaemon::checkForUpdates()
  * @brief Return the daemon instance.
  *
  * If this instance of flameshot is the daemon, a singleton instance of
- * `FlameshotDaemon` is returned. As a side effect`start` will called if it
+ * `FlameshotDaemon` is returned. As a side effect, `start` will called if it
  * wasn't called earlier. If this instance of flameshot is not the daemon,
  * `nullptr` is returned.
  *

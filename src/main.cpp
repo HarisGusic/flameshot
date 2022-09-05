@@ -56,7 +56,7 @@ void requestCaptureAndWait(const CaptureRequest& req)
             qApp->exit(0);
         }
 #else
-        // if this instance is not daemon, make sure it exit after caputre finish
+        // if this instance is not daemon, make sure it exits after capture finish
         if (FlameshotDaemon::instance() == nullptr && !Flameshot::instance()->haveExternalWidget()) {
             qApp->exit(0);
         }
@@ -85,6 +85,38 @@ QSharedMemory* guiMutexLock()
     return shm;
 }
 
+void initApp(bool daemon)
+{
+    QApplication::setStyle(new StyleOverride);
+
+    QTranslator translator, qtTranslator;
+    QStringList trPaths = PathInfo::translationsPaths();
+
+    for (const QString& path : trPaths) {
+        bool match = translator.load(QLocale(),
+                                     QStringLiteral("Internationalization"),
+                                     QStringLiteral("_"),
+                                     path);
+        if (match) {
+            break;
+        }
+    }
+
+    qtTranslator.load(QLocale::system(),
+                      "qt",
+                      "_",
+                      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+
+    qApp->installTranslator(&translator);
+    qApp->installTranslator(&qtTranslator);
+    qApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
+
+    auto c = Flameshot::instance();
+    if (daemon) {
+        FlameshotDaemon::start();
+    }
+}
+
 int main(int argc, char* argv[])
 {
 #ifdef Q_OS_LINUX
@@ -105,44 +137,7 @@ int main(int argc, char* argv[])
 #else
         QtSingleApplication app(argc, argv);
 #endif
-        QApplication::setStyle(new StyleOverride);
-
-        QTranslator translator, qtTranslator;
-        QStringList trPaths = PathInfo::translationsPaths();
-
-        for (const QString& path : trPaths) {
-            bool match = translator.load(QLocale(),
-                                         QStringLiteral("Internationalization"),
-                                         QStringLiteral("_"),
-                                         path);
-            if (match) {
-                break;
-            }
-        }
-
-        qtTranslator.load(
-          QLocale::system(),
-          "qt",
-          "_",
-          QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-
-        qApp->installTranslator(&translator);
-        qApp->installTranslator(&qtTranslator);
-        qApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
-
-        auto c = Flameshot::instance();
-        FlameshotDaemon::start();
-
-#if !(defined(Q_OS_MACOS) || defined(Q_OS_WIN))
-        new FlameshotDBusAdapter(c);
-        QDBusConnection dbus = QDBusConnection::sessionBus();
-        if (!dbus.isConnected()) {
-            AbstractLogger::error()
-              << QObject::tr("Unable to connect via DBus");
-        }
-        dbus.registerObject(QStringLiteral("/"), c);
-        dbus.registerService(QStringLiteral("org.flameshot.Flameshot"));
-#endif
+        initApp(true);
         return qApp->exec();
     }
 
@@ -346,12 +341,14 @@ int main(int argc, char* argv[])
     } else if (parser.isSet(launcherArgument)) { // LAUNCHER
         delete qApp;
         new QApplication(argc, argv);
+        initApp(false);
         Flameshot* flameshot = Flameshot::instance();
         flameshot->launcher();
         qApp->exec();
     } else if (parser.isSet(guiArgument)) { // GUI
         delete qApp;
         new QApplication(argc, argv);
+        initApp(false);
         // Prevent multiple instances of 'flameshot gui' from running if not
         // configured to do so.
         if (!ConfigHandler().allowMultipleGuiInstances()) {
@@ -418,6 +415,7 @@ int main(int argc, char* argv[])
         // TODO find a way so we don't have to do this
         delete qApp;
         new QApplication(argc, argv);
+        initApp(false);
 
         // Option values
         QString path = parser.value(pathOption);
@@ -456,6 +454,7 @@ int main(int argc, char* argv[])
         // TODO find a way so we don't have to do this
         delete qApp;
         new QApplication(argc, argv);
+        initApp(false);
 
         QString numberStr = parser.value(screenNumberOption);
         // Option values
@@ -528,6 +527,8 @@ int main(int argc, char* argv[])
             // Open gui when no options are given
             delete qApp;
             new QApplication(argc, argv);
+            initApp(false);
+
             QObject::connect(
               qApp, &QApplication::lastWindowClosed, qApp, &QApplication::quit);
             Flameshot::instance()->config();
